@@ -74,10 +74,10 @@ NOTE: Spring Boot provides numerous `FailureAnalyzer` implementations, and you c
 <<howto.adoc#howto-failure-analyzer,add your own>>.
 
 If no failure analyzers are able to handle the exception, you can still display the full
-auto-configuration report to better understand what went wrong. To do so, you need to
+conditions report to better understand what went wrong. To do so, you need to
 <<boot-features-external-config,enable the `debug` property>> or
 <<boot-features-custom-log-levels,enable `DEBUG` logging>> for
-`org.springframework.boot.autoconfigure.logging.AutoConfigurationReportLoggingInitializer`.
+`org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener`.
 
 For instance, if you are running your application by using `java -jar`, you can enable
 the `debug` property as follows:
@@ -574,7 +574,7 @@ following:
 
 Alternatively, when custom config locations are configured by using
 `spring.config.addition-location`, they are used in addition to the default locations.
-Additional locations are search before the default locations. For example, if
+Additional locations are searched before the default locations. For example, if
 additional locations of `classpath:/custom-config/,file:./custom-config/` are configured,
 the search order becomes the following:
 
@@ -723,19 +723,10 @@ previously:
 
 [NOTE]
 ====
-Extra care is required when configuring lists as shown in the preceding example, as
-overriding does not work as you might expect. In the preceding example, when `my.servers`
-is redefined in several places, the individual elements are targeted for overriding, but
-the list itself is not targeted for overriding. To make sure that a `PropertySource` with
-higher precedence can override the list, you need to define it as a single property, as
-shown in the following example:
-
-[source,yaml,indent=0]
-----
-	 my:
-		servers: dev.bar.com,foo.bar.com
-----
-
+When lists are configured in more than one place, overriding works by replacing the entire list.
+In the preceding example, when `my.servers` is redefined in several places, the entire list from
+the `PropertySource` with higher precedence will override any other configuration for that list.
+Both comma-separated lists and yaml lists can be used for completely overriding the contents of the list.
 ====
 
 
@@ -3319,7 +3310,8 @@ The line in the preceding example passes a value of `true` for the
 
 By default, the DDL execution (or validation) is deferred until the `ApplicationContext`
 has started. There is also a `spring.jpa.generate-ddl` flag, but it is not used if
-Hibernate autoconfig is active, because the `ddl-auto` settings are more fine-grained.
+Hibernate auto-configuration is active, because the `ddl-auto` settings are more
+fine-grained.
 
 
 
@@ -3503,6 +3495,9 @@ There is a `spring-boot-starter-data-redis` '`Starter`' for collecting the depen
 in a convenient way. By default, it uses
 https://github.com/lettuce-io/lettuce-core/[Lettuce]. That starter handles both
 traditional and reactive applications.
+
+TIP: we also provide a `spring-boot-starter-data-redis-reactive` '`Starter`' for
+consistency with the other stores with reactive support.
 
 
 
@@ -4052,9 +4047,9 @@ http://docs.spring.io/spring-data/cassandra/docs/[reference documentation].
 http://www.couchbase.com/[Couchbase] is an open-source, distributed multi-model NoSQL
 document-oriented database that is optimized for interactive applications. Spring Boot
 offers auto-configuration for Couchbase and the abstractions on top of it provided by
-https://github.com/spring-projects/spring-data-couchbase[Spring Data Couchbase]. There is
-a `spring-boot-starter-data-couchbase` '`Starter`' for collecting the dependencies in a
-convenient way.
+https://github.com/spring-projects/spring-data-couchbase[Spring Data Couchbase]. There are
+a `spring-boot-starter-data-couchbase` and `spring-boot-starter-data-couchbase-reactive`
+'`Starters`' for collecting the dependencies in a convenient way.
 
 
 
@@ -5999,6 +5994,9 @@ scanned beans to `@Controller`, `@ControllerAdvice`, `@JsonComponent`, `@Convert
 `Filter`, `WebMvcConfigurer`, and `HandlerMethodArgumentResolver`. Regular `@Component`
 beans are not scanned when using this annotation.
 
+TIP: If you need to register extra components such as Jackson `Module`, you can import
+additional configuration classes using `@Import` on your test.
+
 Often, `@WebMvcTest` is limited to a single controller and is used in combination with
 `@MockBean` to provide mock implementations for required collaborators.
 
@@ -6101,6 +6099,9 @@ To test that Spring WebFlux controllers are working as expected, you can use the
 infrastructure and limits scanned beans to `@Controller`, `@ControllerAdvice`,
 `@JsonComponent`, `Converter`, and `WebFluxConfigurer`. Regular `@Component` beans are
 not scanned when the `@WebFluxTest` annotation is used.
+
+TIP: If you need to register extra components such as Jackson `Module`, you can import
+additional configuration classes using `@Import` on your test.
 
 Often, `@WebFluxTest` is limited to a single controller and used in combination with the
 `@MockBean` annotation to provide mock implementations for required collaborators.

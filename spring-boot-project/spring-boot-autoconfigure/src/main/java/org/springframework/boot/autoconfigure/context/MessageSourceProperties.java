@@ -17,6 +17,7 @@
 package org.springframework.boot.autoconfigure.context;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Configuration properties for Message Source.
@@ -37,7 +38,7 @@ public class MessageSourceProperties {
 	/**
 	 * Message bundles encoding.
 	 */
-	private Charset encoding = Charset.forName("UTF-8");
+	private Charset encoding = StandardCharsets.UTF_8;
 
 	/**
 	 * Loaded resource bundle files cache expiration, in seconds. When set to -1, bundles
@@ -47,7 +48,7 @@ public class MessageSourceProperties {
 
 	/**
 	 * Set whether to fall back to the system Locale if no files for a specific Locale
-	 * have been found. if this is turned off, the only fallback will be the default file
+	 * have been found. If this is turned off, the only fallback will be the default file
 	 * (e.g. "messages.properties" for basename "messages").
 	 */
 	private boolean fallbackToSystemLocale = true;
